@@ -123,3 +123,5 @@ Make sure to set your repository URL in `tola.toml` under `[deploy.github]`.
 - [Tola Documentation](https://github.com/tola-ssg/tola-ssg)
 - [Typst Documentation](https://typst.app/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+

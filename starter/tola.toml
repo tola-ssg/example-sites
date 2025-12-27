@@ -8,7 +8,7 @@ author = "Your Name"
 email = "you@example.com"
 description = "A blog built with Typst and Tola"
 language = "en"
-# url = "https://yourdomain.com"  # Set for production
+url = "https://tola-ssg.github.io/example-sites/starter"
 
 [build]
 content = "content"

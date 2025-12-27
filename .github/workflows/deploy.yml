@@ -1,0 +1,77 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Tola
+        run: |
+          # From local tarball (for testing)
+          tar -xzf tola-x86_64-linux-musl.tar.gz
+          sudo mv tola /usr/local/bin/
+          # From release:
+          # curl -fsSL https://github.com/tola-ssg/tola-ssg/releases/latest/download/tola-x86_64-linux-musl.tar.gz | tar -xz
+          # sudo mv tola /usr/local/bin/
+
+      - name: Install Tailwind CSS
+        run: |
+          curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+          chmod +x tailwindcss-linux-x64
+          sudo mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
+
+      - name: Build starter
+        run: |
+          cd starter
+          tola build --clean
+
+      # Add more example sites here when needed:
+      # - name: Build example-site-1
+      #   run: |
+      #     cd example-site-1
+      #     tola build --clean --base-url https://tola-ssg.github.io/example-sites/example-site-1
+
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          # Tola outputs to public/<path_prefix>/ based on build.path_prefix
+          # For starter: path_prefix = "example-sites/starter" → public/example-sites/starter/
+          # GitHub Pages repo is "example-sites", so we skip that level:
+          # Copy public/example-sites/* to _site/
+          cp -r starter/public/example-sites/* _site/
+          # Add more sites here:
+          # cp -r other-site/public/example-sites/* _site/
+
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

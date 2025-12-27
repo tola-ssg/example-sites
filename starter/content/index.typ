@@ -34,7 +34,7 @@
 #let pages = json("/_data/pages.json")
 #let posts = (
   pages
-    .filter(p => p.url.starts-with("/posts/") and p.at("draft", default: false) == false)
+    .filter(p => "/posts/" in p.url and p.at("draft", default: false) == false)
     .sorted(
       key: p => p.date,
     )
